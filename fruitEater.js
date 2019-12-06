@@ -1,12 +1,19 @@
 const { stdin, stdout } = process;
 stdin.setEncoding("utf8");
+const rows = stdout.rows;
+const columns = stdout.columns;
 let fruits = require("./fruits.json");
 const fruitsQue = [];
-const gameInfo = {
-  time: new Date().valueOf(),
-  correctAns: 0,
-  totalChar: 0,
-  wrongAns: 0
+const eaterPosition = { x: 10, y: 10 };
+
+const displayRabbit = function(x, y) {
+  stdout.cursorTo(x, y);
+  console.log("🦧\n");
+};
+
+const displayEnd = function() {
+  stdout.cursorTo(0, rows);
+  console.log("🌾".repeat(Math.ceil(columns / 2)));
 };
 
 const collectFruitInfo = function() {
@@ -25,21 +32,37 @@ const storeNextFruitToPrint = function() {
 const displayFruits = function() {
   stdout.cursorTo(0, 1);
   stdout.clearScreenDown();
-  fruitsQue.forEach(alphabet => {
-    stdout.cursorTo(alphabet.x, alphabet.y);
-    console.log(alphabet.item);
-    alphabet.y += 1;
+  fruitsQue.forEach(fruit => {
+    stdout.cursorTo(fruit.x, fruit.y);
+    console.log(fruit.item);
+    fruit.y += 1;
+  });
+};
+
+const exitGame = function() {
+  console.clear();
+  process.exit(0);
+};
+
+const isGameOver = function() {
+  fruitsQue.forEach(fruit => {
+    if (fruit.y == rows) {
+      exitGame();
+    }
   });
 };
 
 const fallChars = function() {
   displayFruits();
-  stdout.cursorTo(0, 90);
+  displayRabbit();
+  displayEnd();
+  isGameOver();
 };
 
 const main = function() {
-  setInterval(fallChars, 5000);
-  setInterval(storeNextFruitToPrint, 5000);
+  setInterval(fallChars, 1000);
+  setInterval(storeNextFruitToPrint, 3000);
+  stdin.on("data", () => {});
 };
 
 main();

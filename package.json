@@ -1,0 +1,24 @@
+{
+  "name": "fruiteater",
+  "version": "1.0.0",
+  "description": "",
+  "main": "fruitEater.js",
+  "dependencies": {
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node fruitEater.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nooranasrin/fruitCatching.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nooranasrin/fruitCatching/issues"
+  },
+  "homepage": "https://github.com/nooranasrin/fruitCatching#readme"
+}

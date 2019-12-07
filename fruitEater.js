@@ -5,17 +5,12 @@ const columns = stdout.columns;
 stdin.setRawMode(true);
 let fruits = require("./fruits.json");
 const fruitsQue = [];
-const eaterPosition = { eater: "🦧", x: 10, y: 10 };
+const catcherInfo = { catcher: "🗑 🗑 🗑 🗑", left: 20, right: 28, rows: 10 };
 
-const displayRabbit = function(x, y) {
+const displayCatcher = function(x, y) {
   stdout.cursorTo(x, y);
   process.stderr.write("\x1B[?25l");
-  console.log(eaterPosition.eater);
-};
-
-const displayEnd = function() {
-  stdout.cursorTo(0, rows);
-  console.log("🌾".repeat(Math.ceil(columns / 2)));
+  console.log(catcherInfo.catcher);
 };
 
 const collectFruitInfo = function() {
@@ -31,14 +26,16 @@ const storeNextFruitToPrint = function() {
   fruitsQue.push(collectFruitInfo());
 };
 
+const displaySingleFruit = function(fruit) {
+  stdout.cursorTo(fruit.x, fruit.y);
+  console.log(fruit.item);
+  fruit.y += 1;
+};
+
 const displayFruits = function() {
   stdout.cursorTo(0, 1);
   stdout.clearScreenDown();
-  fruitsQue.forEach(fruit => {
-    stdout.cursorTo(fruit.x, fruit.y);
-    console.log(fruit.item);
-    fruit.y += 1;
-  });
+  fruitsQue.forEach(displaySingleFruit);
 };
 
 const exitGame = function() {
@@ -47,19 +44,31 @@ const exitGame = function() {
   process.exit(0);
 };
 
+const isFruitReachedEnd = function(fruit) {
+  if (fruit.y == rows) {
+    exitGame();
+  }
+};
+
 const isGameOver = function() {
-  fruitsQue.forEach(fruit => {
-    if (fruit.y == rows) {
-      exitGame();
-    }
-  });
+  fruitsQue.forEach(isFruitReachedEnd);
 };
 
 const fallChars = function() {
   displayFruits();
-  displayRabbit(eaterPosition.x, eaterPosition.y);
-  displayEnd();
+  displayCatcher(catcherInfo.left, catcherInfo.rows);
   isGameOver();
+};
+
+const isSingleFruitDied = function(fruit) {
+  const { left, right } = catcherInfo;
+  if (fruit.y == catcherInfo.rows && fruit.x >= left && fruit.x <= right) {
+    fruitsQue.splice(fruitsQue.indexOf(fruit), 1);
+  }
+};
+
+const isEat = function() {
+  fruitsQue.forEach(fruit);
 };
 
 const moveEater = function(userDir) {
@@ -69,28 +78,31 @@ const moveEater = function(userDir) {
   }
   const userKeyStroke = keyStrokes.indexOf(userDir);
   if (userDir != -1) {
-    if (userDir == "j" && eaterPosition.x >= 1) {
-      eaterPosition.x -= 2;
-      stdout.cursorTo(eaterPosition.x, eaterPosition.y);
+    if (userKeyStroke === 0 && catcherInfo.left > 1) {
+      catcherInfo.left -= 3;
+      catcherInfo.right -= 3;
     }
-    if (userDir == "l" && eaterPosition.x < rows) {
-      eaterPosition.x += 2;
-      stdout.cursorTo(eaterPosition.x, eaterPosition.y);
+    if (userKeyStroke === 1 && catcherInfo.right < columns) {
+      catcherInfo.left += 3;
+      catcherInfo.right += 3;
     }
-    if (userDir == "i" && eaterPosition.y > 2) {
-      eaterPosition.y -= 2;
-      stdout.cursorTo(eaterPosition.x, eaterPosition.y);
+    if (userKeyStroke === 2 && catcherInfo.rows > 2) {
+      catcherInfo.rows -= 3;
     }
-    if (userDir == "k" && eaterPosition.y < columns) {
-      eaterPosition.y += 2;
-      stdout.cursorTo(eaterPosition.x, eaterPosition.y);
+    if (userKeyStroke === 3 && catcherInfo.rows < rows) {
+      catcherInfo.rows += 3;
     }
+    stdout.cursorTo(catcherInfo.rows, catcherInfo.left);
   }
+  isEat();
 };
 
 const main = function() {
-  setInterval(fallChars, 900);
-  setInterval(storeNextFruitToPrint, 3000);
+  setInterval(() => {
+    isEat();
+  }, 1);
+  setInterval(fallChars, 500);
+  setInterval(storeNextFruitToPrint, 5000);
   stdin.on("data", moveEater);
 };
 

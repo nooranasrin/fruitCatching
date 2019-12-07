@@ -3,6 +3,7 @@ stdin.setEncoding("utf8");
 const rows = stdout.rows;
 const columns = stdout.columns;
 stdin.setRawMode(true);
+const rl = require("readline-sync");
 let fruits = require("./fruits.json");
 const fruitsQue = [];
 const catcherInfo = { catcher: "🗑 🗑 🗑 🗑", left: 20, right: 28, rows: 10 };
@@ -109,8 +110,17 @@ const moveEater = function(userDir) {
   isEat();
 };
 
-const main = function() {
+const printInstructions = function() {
+  let instructions = `Press l for right\nPress j for left\nPress i for up\n`;
+  instructions =
+    instructions + `Press k for down\nPress q for quit\nPress enter to start\n`;
+  rl.question(instructions);
   console.clear();
+};
+
+const main = function() {
+  printInstructions();
+  stdin.resume();
   setInterval(() => {
     isEat();
   }, 1);
